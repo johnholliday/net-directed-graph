@@ -106,7 +106,7 @@ namespace DirectedGraph
         /// <param name="start">The value object of the starting node.</param>
         /// <param name="end">The value object of the ending node.</param>
         /// <param name="weight">The weight of this edge.</param>
-        public void AddNode(T start, T end, W weight)
+        public void AddEdge(T start, T end, W weight)
         {
             Node<T, W> s = new Node<T, W>(start, default(W));
 
@@ -148,7 +148,7 @@ namespace DirectedGraph
             searchResult.Push(s); // push start node
             searchResults.Push(searchResult);
 
-            Search(s, s, e, searchResults, depth, weight, cycle);
+            Search(s, e, searchResults, depth, weight, cycle);
 
             if (searchResults.Peek().Length == 1)
             {
@@ -161,20 +161,20 @@ namespace DirectedGraph
         /// <summary>
         /// <see cref="DirectedGraph.Search(T start, T end, int depth = 10, W weight, bool cycle)"/>
         /// </summary>
-        private void Search(Node<T, W> initialStart, Node<T, W> start, Node<T, W> end, LinkedList<LinkedList<Node<T, W>>> searchResults, int depth, W weight, bool cycle)
+        private void Search(Node<T, W> start, Node<T, W> end, LinkedList<LinkedList<Node<T, W>>> searchResults, int depth, W weight, bool cycle)
         {
-            Node<T, W> result = nodes.Find(start);
+            Node<T, W> node = nodes.Find(start);
 
-            if (result == null)
+            if (node == null)
             {
                 return;
             }
 
-            foreach (Node<T, W> node in result.AdjacentNodes)
+            foreach (Node<T, W> adjacentNode in node.AdjacentNodes)
             {
                 // Add node to search result
-                searchResults.Peek().Push(node); // add node
-                searchResults.Peek()[0].Weight = (dynamic)searchResults.Peek()[0].Weight + node.Weight;
+                searchResults.Peek().Push(adjacentNode); // add node
+                searchResults.Peek()[0].Weight = (dynamic)searchResults.Peek()[0].Weight + adjacentNode.Weight;
 
                 // Continue search
                 bool continueSearch = true;
@@ -200,7 +200,7 @@ namespace DirectedGraph
 
                 if (continueSearch)
                 {
-                    if (end.Equals(node))
+                    if (end.Equals(adjacentNode))
                     {
                         // Create a copy of the current result to search deeper
                         LinkedList<Node<T, W>> searchResult = searchResults.Peek().Copy();
@@ -208,19 +208,19 @@ namespace DirectedGraph
                     }
 
                     // Continue to search deeper
-                    Search(initialStart, node, end, searchResults, depth, weight, cycle);
+                    Search(adjacentNode, end, searchResults, depth, weight, cycle);
 
                     if (length == searchResults.Peek().Length)
                     {
                         // No new node added, dead end
                         searchResults.Peek().Pop(); // remove node
-                        searchResults.Peek()[0].Weight = (dynamic)searchResults.Peek()[0].Weight - node.Weight;
+                        searchResults.Peek()[0].Weight = (dynamic)searchResults.Peek()[0].Weight - adjacentNode.Weight;
                     }
                 }
                 else
                 {
                     searchResults.Peek().Pop(); // remove node
-                    searchResults.Peek()[0].Weight = (dynamic)(searchResults.Peek()[0].Weight) - node.Weight;
+                    searchResults.Peek()[0].Weight = (dynamic)(searchResults.Peek()[0].Weight) - adjacentNode.Weight;
                     return;
                 }
             }
