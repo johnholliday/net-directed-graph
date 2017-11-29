@@ -71,7 +71,7 @@ namespace DirectedGraph
                 LinkedListItem<T> item = Find(i);
 
                 if (item == null)
-                    throw new IndexOutOfRangeException();
+                    return default(T);
 
                 return Find(i).value;
             }
